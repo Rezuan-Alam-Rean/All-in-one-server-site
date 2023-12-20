@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -31,8 +31,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const projectCollection = client.db('Putul').collection('projects');
+    const artsCollection = client.db('Putul').collection('arts');
+      
+    
+    // projects
+
 
     app.get('/projects',  async (req, res) => {
       const cursor = projectCollection.find();
@@ -40,13 +45,42 @@ async function run() {
       res.send(result);
   })
 
+  // get single project using params
+  app.get("/projects/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await projectCollection.findOne(query);
+
+    res.send(result);
+  });
+
+
+  // arts
+    app.get('/arts',  async (req, res) => {
+      const cursor = artsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+  })
+
+  // get single project using params
+  app.get("/arts/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await artsCollection.findOne(query);
+
+    res.send(result);
+  });
+
 
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } 
+  
+  
+  finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
